@@ -1,39 +1,25 @@
-{{ $handle := .Get 0 }}
+<div id="shopify-buy-button-{{ .Get 0 }}"></div>
 
-<div id="shopify-product-{{ $handle }}"></div>
+<script src="https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js"></script>
 
 <script>
 (function () {
-  var scriptURL = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
+  var client = ShopifyBuy.buildClient({
+    domain: 'zahrahalal.myshopify.com',
+    storefrontAccessToken: '718f35c440d3a07bec10a7ce2ffab5b2',
+  });
 
-  function loadScript(callback) {
-    var script = document.createElement('script');
-    script.async = true;
-    script.src = scriptURL;
-    script.onload = callback;
-    document.head.appendChild(script);
-  }
-
-  function initShopify() {
-    var client = ShopifyBuy.buildClient({
-      domain: 'zahrahalal.myshopify.com',
-      storefrontAccessToken: '718f35c440d3a07bec10a7ce2ffab5b2',
+  ShopifyBuy.UI.onReady(client).then(function (ui) {
+    ui.createComponent('product', {
+      id: '{{ .Get 1 }}',
+      node: document.getElementById('shopify-buy-button-{{ .Get 0 }}'),
+      options: {
+        product: {
+          buttonDestination: 'checkout',
+          text: { button: 'Buy Now' }
+        }
+      }
     });
-
-    ShopifyBuy.UI.onReady(client).then(function (ui) {
-      ui.createComponent('product', {
-        id: '{{ .Site.Params.shopify_product_map }}'['{{ $handle }}'],
-        node: document.getElementById('shopify-product-{{ $handle }}'),
-        moneyFormat: '%E2%82%AC%7B%7Bamount_with_comma_separator%7D%7D',
-        options: {}
-      });
-    });
-  }
-
-  if (!window.ShopifyBuy) {
-    loadScript(initShopify);
-  } else {
-    initShopify();
-  }
+  });
 })();
 </script>
